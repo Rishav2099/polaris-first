@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import { Allotment } from "allotment";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import  { FileExplorer } from "./file-explorer";
+import { Id } from "@/convex/_generated/dataModel";
 
 const MIN_SIDEBAR_WIDTH = 200;
 const MAX_SIDEBAR_WIDTH = 800;
@@ -32,7 +34,7 @@ const Tab = ({
   );
 };
 
-const ProjectIdView = () => {
+const ProjectIdView = ({projectId}: {projectId: Id<'projects'>}) => {
   const [activeView, setActiveView] = useState<"editor" | "preview">("editor");
 
   return (
@@ -66,7 +68,7 @@ const ProjectIdView = () => {
               maxSize={MAX_SIDEBAR_WIDTH}
               preferredSize={DEFAULT_SIDEBAR_WIDTH}
             >
-              editor
+              <FileExplorer projectId={projectId} />
             </Allotment.Pane>
             <Allotment.Pane>
                 Editor view
