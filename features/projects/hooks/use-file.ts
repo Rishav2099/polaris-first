@@ -55,6 +55,11 @@ export const useCreateFile = () => {
   );
 };
 
+export const useUpdateFile = () => {
+  return useMutation(api.files.updateFile);
+  // TODO: add optimistic mutation
+}
+
 export const useCreateFolder = () => {
   return useMutation(api.files.createFolder).withOptimisticUpdate(
     (localStorage, args) => {

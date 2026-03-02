@@ -20,7 +20,7 @@ import Tree from "./tree";
 
 export const FileExplorer = ({ projectId }: { projectId: Id<"projects"> }) => {
   const project = useProject(projectId);
-  const [isopen, setIsopen] = useState(false);
+  const [isopen, setIsopen] = useState(true);
   const [creating, setCreating] = useState<"file" | "folder" | null>(null);
   const [collapseKey, setCollapseKey] = useState(0);
 
@@ -110,12 +110,12 @@ export const FileExplorer = ({ projectId }: { projectId: Id<"projects"> }) => {
             />
           )}
           {rootFiles?.map((item) => (
-           <Tree
-                key={`${item._id}-${collapseKey}`}
-               item={item}
-               level={0}
-               projectId={projectId}
-           />
+            <Tree
+              key={`${item._id}-${collapseKey}`}
+              item={item}
+              level={0}
+              projectId={projectId}
+            />
           ))}
         </>
       )}
