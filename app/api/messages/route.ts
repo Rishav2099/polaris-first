@@ -4,7 +4,7 @@ import { inngest } from "@/inngest/client";
 import { convex } from "@/lib/convex-client";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import z, { success } from "zod";
+import z from "zod";
 
 const requestSchema = z.object({
   conversationId: z.string(),
@@ -44,6 +44,31 @@ export async function POST(request: NextRequest) {
 
     const projectId = conversations.projectId;
 
+    // cancel all processing message
+    const processingMessages = await convex.query(
+      api.system.getProcessingMessage,
+      { projectId, internalKey },
+    );
+
+    if (processingMessages.length > 0) {
+      await Promise.all(
+        processingMessages.map(async (msg) => {
+          await inngest.send({
+            name: "message/cancel",
+            data: {
+              messageId: msg._id,
+            },
+          });
+
+          await convex.mutation(api.system.updateMessageStatus, {
+            internalKey,
+            messageId: msg._id,
+            status: "cancelled",
+          });
+        }),
+      );
+    }
+
     await convex.mutation(api.system.createMessage, {
       internalKey,
       conversationId: conversationId as Id<"conversations">,
@@ -65,6 +90,9 @@ export async function POST(request: NextRequest) {
       name: "message/sent",
       data: {
         messageId: assistantMessageId,
+        conversationId: conversationId,
+        projectId: projectId,
+        message: message
       },
     });
 
