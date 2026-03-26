@@ -14,9 +14,11 @@ import ProjectList from "./project-list";
 import { useCreateProject } from "../hooks/use-projects";
 import { useEffect, useState } from "react";
 import { ProjectsCommandDialog } from "./project-command-dialog";
+import ImportGithubDialog from "./import-github-dialog";
 
 export const ProjectView = () => {
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
+  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
 
   const createProject = useCreateProject();
 
@@ -26,6 +28,12 @@ export const ProjectView = () => {
         if (e.key === "k") {
           e.preventDefault();
           setCommandDialogOpen(true);
+        }
+      }
+      if (e.metaKey || e.ctrlKey) {
+        if (e.key === "i") {
+          e.preventDefault();
+          setGithubDialogOpen(true);
         }
       }
     };
@@ -41,6 +49,10 @@ export const ProjectView = () => {
       <ProjectsCommandDialog
         open={commandDialogOpen}
         onOpenChange={setCommandDialogOpen}
+      />
+      <ImportGithubDialog
+        open={githubDialogOpen}
+        onOpenChange={setGithubDialogOpen}
       />
       <div className="flex flex-col  justify-center h-screen w-full mx-auto gap-4 max-w-sm">
         <div className="flex gap-2">
@@ -72,6 +84,7 @@ export const ProjectView = () => {
           <Button
             variant={"outline"}
             className="h-full items-start justify-between p-4 bg-background border flex flex-col gap-6 rounded-none"
+            onClick={() => setGithubDialogOpen(true)}
           >
             <div className="flex w-full justify-between">
               <FaGithub className="size-4" />

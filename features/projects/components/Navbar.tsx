@@ -63,15 +63,19 @@ const Navbar = ({ projectId }: { projectId: Id<"projects"> }) => {
       <div className="flex items-center gap-x-2">
         <Breadcrumb>
           <BreadcrumbList className="gap-x-0!">
-          <BreadcrumbItem>
-  {/* Just use the Button with Link directly, skip BreadcrumbLink if using asChild anyway */}
-  <Button variant="ghost" className="w-fit! p-1.5! h-7! gap-1.5" asChild>
-    <Link href="/">
-      <Image src="/vercel.svg" alt="Logo" width={20} height={20} />
-      <span className="text-sm font-medium">Polaris</span>
-    </Link>
-  </Button>
-</BreadcrumbItem>
+            <BreadcrumbItem>
+              {/* Just use the Button with Link directly, skip BreadcrumbLink if using asChild anyway */}
+              <Button
+                variant="ghost"
+                className="w-fit! p-1.5! h-7! gap-1.5"
+                asChild
+              >
+                <Link href="/">
+                  <Image src="/vercel.svg" alt="Logo" width={20} height={20} />
+                  <span className="text-sm font-medium">Polaris</span>
+                </Link>
+              </Button>
+            </BreadcrumbItem>
             <BreadcrumbSeparator className="ml-0! mr-1!" />
             <BreadcrumbItem>
               {isRenaming ? (
