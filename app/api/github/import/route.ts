@@ -21,10 +21,16 @@ function parseGitHubUrl(url: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const { userId, has } = await auth();
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const hasPro = has({ plan: "pro" });
+
+    if (!hasPro) {
+      return NextResponse.json({ error: "Pro plan required" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-      const internalKey = process.env.POLARIS_CONVEX_INTERNAL_KEY;
+    const internalKey = process.env.POLARIS_CONVEX_INTERNAL_KEY;
 
     if (!internalKey) {
       console.error("Missing POLARIS_CONVEX_INTERNAL_KEY");
@@ -65,32 +71,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-        // Create Project in Convex
+    // Create Project in Convex
     const projectId = await convex.mutation(api.system.createProject, {
-        internalKey,
-        name: repo,
-        ownerId: userId
-    })
+      internalKey,
+      name: repo,
+      ownerId: userId,
+    });
 
     // send Event to Inngest
     const event = await inngest.send({
-        name: 'github/import.repo',
-        data: {
-            owner,
-            repo,
-            projectId,
-            githubToken,
-        }
-    })
+      name: "github/import.repo",
+      data: {
+        owner,
+        repo,
+        projectId,
+        githubToken,
+      },
+    });
 
     return NextResponse.json({
-        success: true,
-        projectId,
-        eventId: event.ids[0],
-    })
-
+      success: true,
+      projectId,
+      eventId: event.ids[0],
+    });
   } catch (error) {
-      console.error("[GITHUB IMPORT ERROR]", error);
+    console.error("[GITHUB IMPORT ERROR]", error);
 
     const message =
       error instanceof Error ? error.message : "Internal Server Error";

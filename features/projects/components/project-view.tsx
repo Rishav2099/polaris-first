@@ -15,12 +15,12 @@ import { useCreateProject } from "../hooks/use-projects";
 import { useEffect, useState } from "react";
 import { ProjectsCommandDialog } from "./project-command-dialog";
 import ImportGithubDialog from "./import-github-dialog";
+import NewProjectDialog from "./new-project-dialog";
 
 export const ProjectView = () => {
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
   const [githubDialogOpen, setGithubDialogOpen] = useState(false);
-
-  const createProject = useCreateProject();
+  const [newProjectDialog, setNewProjectDialog] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -29,11 +29,13 @@ export const ProjectView = () => {
           e.preventDefault();
           setCommandDialogOpen(true);
         }
-      }
-      if (e.metaKey || e.ctrlKey) {
         if (e.key === "i") {
           e.preventDefault();
           setGithubDialogOpen(true);
+        }
+        if (e.key === "j") {
+          e.preventDefault();
+          setNewProjectDialog(true);
         }
       }
     };
@@ -54,6 +56,10 @@ export const ProjectView = () => {
         open={githubDialogOpen}
         onOpenChange={setGithubDialogOpen}
       />
+      <NewProjectDialog
+        open={newProjectDialog}
+        onOpenChange={setNewProjectDialog}
+      />
       <div className="flex flex-col  justify-center h-screen w-full mx-auto gap-4 max-w-sm">
         <div className="flex gap-2">
           <img src="/vercel.svg" alt="logo" className="w-10 h-10" />
@@ -63,13 +69,7 @@ export const ProjectView = () => {
           <Button
             variant={"outline"}
             onClick={() => {
-              createProject({
-                name: uniqueNamesGenerator({
-                  dictionaries: [adjectives, animals, colors],
-                  separator: "-",
-                  length: 3,
-                }),
-              });
+              setNewProjectDialog(true);
             }}
             className="h-full items-start justify-between p-4 bg-background border flex flex-col gap-6 rounded-none"
           >
