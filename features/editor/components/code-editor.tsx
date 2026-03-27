@@ -26,6 +26,7 @@ const CodeEditor = ({ fileName, initialValue = '', onChange }: Props) => {
     [fileName],
   );
 
+  // 1. THE MOUNTING EFFECT
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -44,7 +45,9 @@ const CodeEditor = ({ fileName, initialValue = '', onChange }: Props) => {
         minimap(),
         indentationMarkers(),
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
+          // Only trigger onChange if the user ACTUALLY typed something.
+          // This prevents infinite loops when we update the doc programmatically below.
+          if (update.docChanged && update.transactions.some(tr => tr.isUserEvent('input') || tr.isUserEvent('delete'))) {
             onChange(update.state.doc.toString());
           }
         }),
@@ -55,8 +58,32 @@ const CodeEditor = ({ fileName, initialValue = '', onChange }: Props) => {
 
     return () => {
       view.destroy();
+      viewRef.current = null;
     };
-  }, [languageExtension]);
+    // FIX: Depend on fileName! This forces a complete editor reset (clearing history/selection) 
+    // whenever you switch to a different tab, completely preventing the RangeError crash.
+  }, [fileName, languageExtension]); 
+
+
+  // 2. THE REAL-TIME SYNC EFFECT
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+
+    const currentValue = view.state.doc.toString();
+    
+    // If Convex passes down a new initialValue (e.g. Gemini wrote code), 
+    // and it doesn't match what is currently in the editor, inject it!
+    if (initialValue !== currentValue) {
+      view.dispatch({
+        changes: {
+          from: 0,
+          to: currentValue.length,
+          insert: initialValue,
+        },
+      });
+    }
+  }, [initialValue]);
 
   return <div ref={editorRef} className="flex-1 min-h-0 pl-4 bg-background" />;
 };
