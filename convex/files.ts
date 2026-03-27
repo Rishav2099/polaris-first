@@ -33,7 +33,7 @@ export const getFile = query({
     const file = await ctx.db.get("files", args.id);
 
     if (!file) {
-      throw new Error("File not found");
+      return null
     }
 
     const project = await ctx.db.get("projects", file.projectId);

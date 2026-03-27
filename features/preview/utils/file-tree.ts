@@ -32,7 +32,12 @@ export const buildFileTree = (files: FileDoc[]): FileSystemTree => {
 
       if (isLast) {
         if (file.type === "folder") {
-          current[part] = { directory: {} };
+          // FIX: Only create the directory if it doesn't already exist!
+          // This prevents overwriting folders that were created by child files.
+
+          if (!current[part]) {
+            current[part] = { directory: {} };
+          }
         } else if (!file.storageId && file.content !== undefined) {
           current[part] = { file: { contents: file.content } };
         }
