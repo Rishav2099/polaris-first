@@ -107,13 +107,14 @@ const Tree = ({
         level={level}
         isActive={isActive}
         onClick={() => {
-          console.log('Opening file', item._id)
-          openFile(item._id, { pinned: false }
-          )}}
+          console.log("Opening file", item._id);
+          openFile(item._id, { pinned: false });
+        }}
         onDoubleClick={() => openFile(item._id, { pinned: true })}
         onRename={() => setIsRenaming(true)}
         onDelete={() => {
           deleteFile({ id: item._id });
+          closeTab(item._id);
         }}
       >
         <FileIcon fileName={fileName} autoAssign className="size-4" />
