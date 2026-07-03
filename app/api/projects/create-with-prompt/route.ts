@@ -34,7 +34,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { prompt } = requestSchema.parse(body);
+    // Improvement: Use safeParse to handle validation errors gracefully
+    const parsedBody = requestSchema.safeParse(body);
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        {
+          error: "Invalid request payload",
+          details: parsedBody.error.format(),
+        },
+        { status: 400 },
+      );
+    }
+
+    const { prompt } = parsedBody.data;
 
     // Generate a random project name
     const projectName = uniqueNamesGenerator({
@@ -83,8 +95,10 @@ export async function POST(request: NextRequest) {
         message: prompt,
       },
     });
+
+    return NextResponse.json({projectId})
   } catch (error) {
-    console.log(error);
+    console.error("Error creating project/conversation:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },
